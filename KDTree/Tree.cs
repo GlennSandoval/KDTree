@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Medians;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,121 +10,69 @@ using System.Threading.Tasks;
 namespace KDTree
 {
 
-    public class Tree
+    public class Tree<T> where T : IComparable
     {
 
-        private Node _root;
-        private int _maxDepth = 10;
+        private Node<T> _root;
+        private const int MAXDEPTH = 10;
+        private const int MIN_NODE_ITEM_COUNT = 3;
 
-        public Tree(IList<IList<double>> points, int depth)
+        public Tree(IList<IList<T>> points)
         {
-            Node n = new Node();
-            n.Data = points;
-            BuildTree(n, 1);
+            _root = new Node<T>();
+            _root.Data = points;
+            BuildTree(_root, 1);
         }
 
-        private void BuildTree(Node n, int depth)
+        private void BuildTree(Node<T> node, int depth)
         {
-            if (depth >= _maxDepth)
+            if (depth >= MAXDEPTH || node.Data.Count <= MIN_NODE_ITEM_COUNT)
             {
                 return;
             }
 
+            var data = new List<IList<T>>(node.Data);
+            var index = depth % data[0].Count; // data[0].Count is K
 
-        }
-
-
-        T FindMedian<T>(IEnumerable<T> list, Comparison<T> compare)
-        {
-
-            if (list == null || list.Count() == 0)
+            var median = Median.FindMedian<IList<T>>(data, (left, right) =>
             {
-                throw new ArgumentException();
-            }
+                var leftValue = left[index];
+                var rightValue = right[index];
+                return leftValue.CompareTo(rightValue);
+            });
 
-            int count = list.Count();
+            var splitPos = data.IndexOf(median);
+            var leftNode = new Node<T>();
+            node.Left = leftNode;
 
-            var right = Select(list, count / 2, compare);
+            var rightNode = new Node<T>();
+            node.Right = rightNode;
 
-            if (list.Count() % 2 != 0)
+            foreach (var point in data)
             {
-                return right;
-            }
-            else
-            {
-                var left = Select(list, (list.Count() / 2) + 1, compare);
-                return left;
-            }
-        }
-
-        T Select<T>(IEnumerable<T> list, int position, Comparison<T> compare)
-        {
-            if (list.Count() < 10)
-            {
-                var l = new List<T>(list);
-                l.Sort();
-                return l[position - 1];
-            }
-
-            var s = new List<List<T>>();
-
-            int partitions = list.Count() / 5;
-
-            List<T> wrapper = new List<T>(list);
-
-            for (int i = 0; i < partitions; i++)
-            {
-                s.Add(new List<T>(wrapper.GetRange(i * 5, 5)));
-            }
-
-            List<T> medians = new List<T>();
-
-            foreach (var sl in s)
-            {
-                medians.Add(Select(sl, 3, compare));
-            }
-
-            var medianOfMedians = Select(medians, list.Count() / 10, compare);
-
-            List<T> l1 = new List<T>();
-            List<T> l3 = new List<T>();
-
-            foreach (var d in list)
-            {
-                if (compare(d, medianOfMedians) < 0)
+                if (point[index].CompareTo(median[index]) > 0)
                 {
-                    l1.Add(d);
+                    leftNode.Data.Add(point);
                 }
                 else
                 {
-                    l3.Add(d);
+                    rightNode.Data.Add(point);
                 }
             }
 
-            if (position <= l1.Count)
-            {
-                return Select(l1, position, compare);
-            }
-            else if (position > l1.Count + l3.Count)
-            {
-                return Select(l3, position - l1.Count - l3.Count, compare);
-            }
-            else
-            {
-                return medianOfMedians;
-            }
+            BuildTree(leftNode, depth + 1);
+            BuildTree(rightNode, depth + 1);
 
         }
 
+
     }
 
-    public class Node
+    class Node<T> where T : IComparable
     {
-        public Node Left;
-        public Node Right;
-        public double Split;
-        public IList<IList<double>> Data;
-
+        public Node<T> Left;
+        public Node<T> Right;
+        public IList<IList<T>> Data = new List<IList<T>>();
     }
 
 }
