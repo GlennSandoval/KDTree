@@ -1,5 +1,4 @@
-﻿using Medians;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,12 +33,14 @@ namespace KDTree
             var data = new List<IList<T>>(node.Data);
             var index = depth % data[0].Count; // data[0].Count is K
 
-            var median = Median.FindMedian<IList<T>>(data, (left, right) =>
+            data.Sort((left, right) =>
             {
                 var leftValue = left[index];
                 var rightValue = right[index];
                 return leftValue.CompareTo(rightValue);
             });
+
+            var median = data[(int)Math.Floor(data.Count / 2.0)];
 
             var splitPos = data.IndexOf(median);
             var leftNode = new Node<T>();
