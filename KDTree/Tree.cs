@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace KDTree
 {
+    /**
+     * https://en.wikipedia.org/wiki/K-d_tree
+     */
     public class Tree<T> where T : IComparable
     {
         private const int MAX_DEPTH = 10;
@@ -26,38 +29,39 @@ namespace KDTree
                 return;
             }
 
-            var data = new List<IList<T>>(node.Data);
-            var index = depth % data[0].Count; // data[0].Count is K
+            var pointList = new List<IList<T>>(node.Data);
+            // Select axis based on depth so that axis cycles through all valid values
+            var axis = depth % pointList[0].Count;
 
-            data.Sort((left, right) =>
+            // Sort point list and choose median as pivot element
+            pointList.Sort((left, right) =>
             {
-                var leftValue = left[index];
-                var rightValue = right[index];
+                var leftValue = left[axis];
+                var rightValue = right[axis];
                 return leftValue.CompareTo(rightValue);
             });
+            var median = pointList[(int)Math.Floor(pointList.Count / 2.0)];
 
-            var median = data[(int)Math.Floor(data.Count / 2.0)];
+            var leftChild = new Node<T>();
+            node.Left = leftChild;
 
-            var leftNode = new Node<T>();
-            node.Left = leftNode;
+            var rightChild = new Node<T>();
+            node.Right = rightChild;
 
-            var rightNode = new Node<T>();
-            node.Right = rightNode;
-
-            foreach (var point in data)
+            foreach (var point in pointList)
             {
-                if (point[index].CompareTo(median[index]) > 0)
+                if (point[axis].CompareTo(median[axis]) > 0)
                 {
-                    leftNode.Data.Add(point);
+                    leftChild.Data.Add(point);
                 }
                 else
                 {
-                    rightNode.Data.Add(point);
+                    rightChild.Data.Add(point);
                 }
             }
 
-            BuildTree(leftNode, depth + 1);
-            BuildTree(rightNode, depth + 1);
+            BuildTree(leftChild, depth + 1);
+            BuildTree(rightChild, depth + 1);
         }
     }
 
