@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// My learning project for KD Trees
-
 namespace KDTree
 {
-    /**
-     * https://en.wikipedia.org/wiki/K-d_tree
-     */
     /// <summary>
     /// A K-dimensional tree implementation for efficient nearest neighbor searches in multi-dimensional space.
     /// </summary>
@@ -92,6 +87,6 @@ namespace KDTree
         /// <summary>
         /// The data points contained in this node.
         /// </summary>
-        public IList<IList<T>> Data = new List<IList<T>>();
+        public IList<IList<T>> Data = [];
     }
 }
