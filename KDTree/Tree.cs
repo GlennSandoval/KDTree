@@ -8,11 +8,19 @@ namespace KDTree
     /**
      * https://en.wikipedia.org/wiki/K-d_tree
      */
+    /// <summary>
+    /// A K-dimensional tree implementation for efficient nearest neighbor searches in multi-dimensional space.
+    /// </summary>
+    /// <typeparam name="T">The type of values in the points, must implement IComparable.</typeparam>
     public class Tree<T> where T : IComparable
     {
         private const int MAX_DEPTH = 10;
         private const int MIN_NODE_ITEM_COUNT = 3;
 
+        /// <summary>
+        /// Initializes a new instance of the KD-Tree with the specified points.
+        /// </summary>
+        /// <param name="points">A list of points where each point is represented as a list of coordinates.</param>
         public Tree(IList<IList<T>> points)
         {
             var root = new Node<T>
@@ -65,10 +73,25 @@ namespace KDTree
         }
     }
 
+    /// <summary>
+    /// Represents a node in the KD-Tree.
+    /// </summary>
+    /// <typeparam name="T">The type of values in the points, must implement IComparable.</typeparam>
     class Node<T> where T : IComparable
     {
+        /// <summary>
+        /// The left child node.
+        /// </summary>
         public Node<T> Left;
+        
+        /// <summary>
+        /// The right child node.
+        /// </summary>
         public Node<T> Right;
+        
+        /// <summary>
+        /// The data points contained in this node.
+        /// </summary>
         public IList<IList<T>> Data = new List<IList<T>>();
     }
 }
