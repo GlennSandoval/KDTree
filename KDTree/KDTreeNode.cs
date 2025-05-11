@@ -23,5 +23,10 @@ namespace KDTree
         /// Gets or sets the right child of this node.
         /// </summary>
         public KDTreeNode<T> Right { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this node is a leaf (has no children).
+        /// </summary>
+        public bool IsLeaf => Left == null && Right == null;
     }
 }
