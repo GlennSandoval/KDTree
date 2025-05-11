@@ -1,23 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace KDTree
 {
+
+    /// <summary>
+    /// Delegate for building a KD-Tree node.
+    /// </summary>
+    /// <typeparam name="T">The type of values in the points, must implement IComparable.</typeparam>
+    /// <param name="node">The current KD-Tree node being built.</param>
+    /// <param name="depth">The current depth of the node in the tree.</param>
+    /// <param name="maxDepth">The maximum depth allowed for the tree.</param>
+    /// <param name="minNodeItemCount">The minimum number of items required in a node.</param>
+    public delegate void BuildKDTreeDelegate<T>(KDTreeNode<T> node, int depth, int maxDepth, int minNodeItemCount) where T : IComparable;
+
     /// <summary>
     /// A K-dimensional tree implementation for efficient nearest neighbor searches in multi-dimensional space.
     /// </summary>
     /// <typeparam name="T">The type of values in the points, must implement IComparable.</typeparam>
     public class KDTree<T> where T : IComparable
     {
-        private const int MAX_DEPTH = 10;
-        private const int MIN_NODE_ITEM_COUNT = 3;
+        const int MAX_DEPTH = 10;
+        const int MIN_NODE_ITEM_COUNT = 3;
+
+        /// <summary>
+        /// Gets the maximum depth allowed for the KD-Tree.
+        /// </summary>
+        public int MaxDepth { get; private set; }
+        /// <summary>
+        /// Gets the minimum number of items required in a node.
+        /// </summary>
+        public int MinNodeItemCount { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the KD-Tree with the specified points.
         /// </summary>
         /// <param name="points">A list of points where each point is represented as a list of coordinates.</param>
-        public KDTree(IList<IList<T>> points)
+        /// <param name="maxDepth">The maximum depth allowed for the tree.</param>
+        /// <param name="minNodeItemCount">The minimum number of items required in a node.</param>
+        public KDTree(IList<IList<T>> points, int maxDepth = MAX_DEPTH, int minNodeItemCount = MIN_NODE_ITEM_COUNT)
         {
+            this.MaxDepth = maxDepth;
+            this.MinNodeItemCount = minNodeItemCount;
             var root = new KDTreeNode<T>
             {
                 Data = points
@@ -27,7 +53,7 @@ namespace KDTree
 
         private void BuildTree(KDTreeNode<T> node, int depth)
         {
-            if (depth >= MAX_DEPTH || node.Data.Count <= MIN_NODE_ITEM_COUNT)
+            if (depth >= MaxDepth || node.Data.Count <= MinNodeItemCount)
             {
                 return;
             }
@@ -68,3 +94,4 @@ namespace KDTree
         }
     }
 }
+
