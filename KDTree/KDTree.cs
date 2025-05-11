@@ -36,6 +36,12 @@ namespace KDTree
         /// <param name="minNodeItemCount">The minimum number of items required in a node.</param>
         public KDTree(IList<IList<T>> points, int maxDepth = MAX_DEPTH, int minNodeItemCount = MIN_NODE_ITEM_COUNT)
         {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+            
+            if (points.Count == 0)
+                throw new ArgumentException("Points list cannot be empty.", nameof(points));
+            
             this.MaxDepth = maxDepth;
             this.MinNodeItemCount = minNodeItemCount;
             Root = new KDTreeNode<T>
@@ -93,7 +99,6 @@ namespace KDTree
         /// <param name="queryPoint">The point to find the nearest neighbor for.</param>
         /// <returns>The nearest neighbor point to the query point.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the query point is null.</exception>
-        /// <exception cref="ArgumentException">Thrown when the tree is empty or the query point has invalid dimensions.</exception>
         public IList<T> FindNearestNeighbor(IList<T> queryPoint)
         {
             ArgumentNullException.ThrowIfNull(queryPoint);
